@@ -1,0 +1,2 @@
+dist/interface.exe filter=lfs diff=lfs merge=lfs -text
+build/interface/interface.pkg filter=lfs diff=lfs merge=lfs -text
