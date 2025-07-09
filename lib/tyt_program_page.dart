@@ -109,7 +109,7 @@ class _TytProgramPageState extends State<TytProgramPage> {
     debugPrint('✅ Program JSON Kaydedildi: ${file.path}');
 
     if (mounted) {
-      Navigator.pushReplacement(
+      Navigator.push( // ✅ pushReplacement yerine push!
         context,
         MaterialPageRoute(builder: (_) => const DashboardPage()),
       );

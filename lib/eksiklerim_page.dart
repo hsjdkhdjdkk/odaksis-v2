@@ -27,7 +27,6 @@ class _EksiklerimPageState extends State<EksiklerimPage> {
       final content = await file.readAsString();
       final List<dynamic> jsonList = json.decode(content);
 
-      // JSON formatı her öğe map olmalı
       setState(() {
         eksikler = jsonList.cast<Map<String, dynamic>>();
       });
@@ -40,6 +39,8 @@ class _EksiklerimPageState extends State<EksiklerimPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isTablet = MediaQuery.of(context).size.width > 600;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('🧩 Eksiklerim'),
@@ -48,36 +49,69 @@ class _EksiklerimPageState extends State<EksiklerimPage> {
       body: eksikler.isEmpty
           ? const Center(
         child: Text(
-          'Şimdilik yanlış yapılmış soru yok!',
-          style: TextStyle(fontSize: 18),
+          '👏 Şimdilik yanlış yapılmış soru yok!',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
         ),
       )
-          : ListView.builder(
+          : Padding(
         padding: const EdgeInsets.all(16),
-        itemCount: eksikler.length,
-        itemBuilder: (context, index) {
-          final item = eksikler[index];
+        child: ListView.separated(
+          itemCount: eksikler.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 12),
+          itemBuilder: (context, index) {
+            final item = eksikler[index];
 
-          return Card(
-            elevation: 3,
-            margin: const EdgeInsets.only(bottom: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: ListTile(
-              leading: const Icon(Icons.warning_amber,
-                  color: Colors.redAccent),
-              title: Text(
-                'Soru: ${item['soru'] ?? 'Bilinmiyor'}',
-                style: const TextStyle(fontWeight: FontWeight.bold),
+            return Card(
+              elevation: 4,
+              shadowColor: Colors.redAccent.withOpacity(0.4),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
               ),
-              subtitle: Text(
-                'Senin cevabın: ${item['kullanici'] ?? '-'}\n'
-                    'Doğru cevap: ${item['dogru'] ?? '-'}',
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.warning_amber_rounded,
+                            color: Colors.redAccent, size: 28),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            item['soru'] ?? 'Soru bilgisi yok',
+                            style: TextStyle(
+                              fontSize: isTablet ? 18 : 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red.shade700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      '❌ Senin cevabın: ${item['kullanici'] ?? '-'}',
+                      style: TextStyle(
+                        fontSize: isTablet ? 16 : 14,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '✅ Doğru cevap: ${item['dogru'] ?? '-'}',
+                      style: TextStyle(
+                        fontSize: isTablet ? 16 : 14,
+                        color: Colors.green.shade700,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

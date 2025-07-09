@@ -17,6 +17,8 @@ class DersSecimiPage extends StatelessWidget {
       'Felsefe',
     ];
 
+    final isTablet = MediaQuery.of(context).size.width > 600;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('📚 Ders Seçimi'),
@@ -26,9 +28,9 @@ class DersSecimiPage extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         child: GridView.builder(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: MediaQuery.of(context).size.width > 600 ? 3 : 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
+            crossAxisCount: isTablet ? 3 : 2,
+            crossAxisSpacing: 20,
+            mainAxisSpacing: 20,
             childAspectRatio: 1.2,
           ),
           itemCount: dersler.length,
@@ -43,17 +45,32 @@ class DersSecimiPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               child: Ink(
                 decoration: BoxDecoration(
-                  color: Colors.lightBlue.shade50,
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFBBDEFB), Color(0xFFE3F2FD)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.lightBlue.shade200, width: 1.5),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.lightBlue.shade100,
+                      blurRadius: 8,
+                      offset: const Offset(2, 2),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: Colors.lightBlue.shade300,
+                    width: 1.5,
+                  ),
                 ),
                 child: Center(
                   child: Text(
                     dersler[index],
-                    style: const TextStyle(
-                      fontSize: 18,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: isTablet ? 22 : 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.lightBlue,
+                      color: Colors.blue.shade800,
                     ),
                   ),
                 ),

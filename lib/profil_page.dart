@@ -18,12 +18,6 @@ class _ProfilPageState extends State<ProfilPage> {
   String hedefUni = "Boğaziçi";
   String hedefBolum = "Tıp";
 
-  int guncelTYT = 60;
-  int hedefTYT = 90;
-
-  int guncelAYT = 40;
-  int hedefAYT = 80;
-
   @override
   void initState() {
     super.initState();
@@ -39,12 +33,6 @@ class _ProfilPageState extends State<ProfilPage> {
       dogumTarihi = prefs.getString('dogumTarihi') ?? dogumTarihi;
       hedefUni = prefs.getString('hedefUni') ?? hedefUni;
       hedefBolum = prefs.getString('hedefBolum') ?? hedefBolum;
-
-      guncelTYT = prefs.getInt('guncelTYT') ?? guncelTYT;
-      hedefTYT = prefs.getInt('hedefTYT') ?? hedefTYT;
-
-      guncelAYT = prefs.getInt('guncelAYT') ?? guncelAYT;
-      hedefAYT = prefs.getInt('hedefAYT') ?? hedefAYT;
     });
   }
 
@@ -62,12 +50,9 @@ class _ProfilPageState extends State<ProfilPage> {
 
   @override
   Widget build(BuildContext context) {
-    final tytKalan = hedefTYT - guncelTYT;
-    final aytKalan = hedefAYT - guncelAYT;
-
     return Scaffold(
       appBar: AppBar(
-        title: const Text('👤 Profil'),
+        title: const Text('👤 Profil - Paketler'),
         backgroundColor: Colors.lightBlue,
       ),
       body: Padding(
@@ -136,61 +121,98 @@ class _ProfilPageState extends State<ProfilPage> {
 
             const SizedBox(height: 30),
 
-            // TYT Progress
-            Text(
-              "TYT İlerleme",
-              style: Theme.of(context).textTheme.titleLarge,
+            const Text(
+              "Üyelik Planları",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 12),
-            Center(
-              child: SizedBox(
-                height: 150,
-                width: 150,
-                child: CustomPaint(
-                  foregroundPainter: CircleGraphPainter(
-                    guncel: guncelTYT,
-                    hedef: hedefTYT,
-                    toplam: 120,
-                    renkGuncel: Colors.redAccent,
-                    renkHedef: Colors.green,
-                  ),
+            const SizedBox(height: 20),
+            Table(
+              border: TableBorder.all(color: Colors.grey.shade300),
+              columnWidths: const {
+                0: FlexColumnWidth(2),
+                1: FlexColumnWidth(2),
+                2: FlexColumnWidth(2),
+              },
+              children: [
+                // Başlık satırı
+                TableRow(
+                  decoration: const BoxDecoration(color: Color(0xFFE0F7FA)),
+                  children: const [
+                    SizedBox(),
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        'Freemium',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        'Premium',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ),
-            Center(
-              child: Text(
-                "Hedefe ${tytKalan > 0 ? tytKalan : 0} net kaldı",
-                style: const TextStyle(fontSize: 16),
-              ),
+
+                _buildRow('Sınırlı Video (Günde 3)', Icons.check_circle, Icons.check_circle),
+                _buildRow('Sınırsız Video', Icons.close, Icons.check_circle),
+                _buildRow('Odaklanma Modu', Icons.check_circle, Icons.check_circle),
+                _buildRow('Program Hazırlama', Icons.check_circle, Icons.check_circle),
+                _buildRow('Aralıklı Tekrar', Icons.close, Icons.check_circle),
+                _buildRow('Detaylı Deneme Analizi', Icons.close, Icons.check_circle),
+                _buildRow('Destek & İletişim', Icons.close, Icons.check_circle),
+
+                TableRow(
+                  decoration: const BoxDecoration(color: Color(0xFFE0F7FA)),
+                  children: const [
+                    SizedBox(),
+                    Padding(
+                      padding: EdgeInsets.all(12),
+                      child: Text(
+                        'ÜCRETSİZ',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(12),
+                      child: Text(
+                        '89.99 TL / AY',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.deepPurple,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
 
             const SizedBox(height: 30),
-
-            // AYT Progress
-            Text(
-              "AYT İlerleme",
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 12),
-            Center(
-              child: SizedBox(
-                height: 150,
-                width: 150,
-                child: CustomPaint(
-                  foregroundPainter: CircleGraphPainter(
-                    guncel: guncelAYT,
-                    hedef: hedefAYT,
-                    toplam: 160,
-                    renkGuncel: Colors.redAccent,
-                    renkHedef: Colors.green,
-                  ),
-                ),
-              ),
-            ),
-            Center(
-              child: Text(
-                "Hedefe ${aytKalan > 0 ? aytKalan : 0} net kaldı",
-                style: const TextStyle(fontSize: 16),
+            ElevatedButton.icon(
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Premium üyelik satın alma sayfası yakında!')),
+                );
+              },
+              icon: const Icon(Icons.upgrade),
+              label: const Text('Premium Satın Al'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                textStyle: const TextStyle(fontSize: 18),
               ),
             ),
           ],
@@ -198,69 +220,32 @@ class _ProfilPageState extends State<ProfilPage> {
       ),
     );
   }
-}
 
-class CircleGraphPainter extends CustomPainter {
-  final int guncel;
-  final int hedef;
-  final int toplam;
-  final Color renkGuncel;
-  final Color renkHedef;
-
-  CircleGraphPainter({
-    required this.guncel,
-    required this.hedef,
-    required this.toplam,
-    required this.renkGuncel,
-    required this.renkHedef,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    double strokeWidth = 14;
-    double radius = size.width / 2 - strokeWidth;
-
-    final center = Offset(size.width / 2, size.height / 2);
-
-    final basePaint = Paint()
-      ..color = Colors.grey.shade300
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke;
-
-    final guncelPaint = Paint()
-      ..color = renkGuncel
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    final hedefPaint = Paint()
-      ..color = renkHedef
-      ..strokeWidth = strokeWidth
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round;
-
-    canvas.drawCircle(center, radius, basePaint);
-
-    double guncelAngle = 2 * pi * (guncel / toplam);
-    double hedefAngle = 2 * pi * (hedef / toplam);
-
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -pi / 2,
-      guncelAngle,
-      false,
-      guncelPaint,
-    );
-
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -pi / 2 + guncelAngle,
-      hedefAngle - guncelAngle,
-      false,
-      hedefPaint,
+  static TableRow _buildRow(String feature, IconData freeIcon, IconData premiumIcon) {
+    return TableRow(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: Text(
+            feature,
+            style: const TextStyle(fontSize: 16),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: Icon(
+            freeIcon,
+            color: freeIcon == Icons.check_circle ? Colors.green : Colors.red,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: Icon(
+            premiumIcon,
+            color: premiumIcon == Icons.check_circle ? Colors.green : Colors.red,
+          ),
+        ),
+      ],
     );
   }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }

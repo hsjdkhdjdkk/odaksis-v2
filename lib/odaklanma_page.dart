@@ -21,6 +21,8 @@ class _OdaklanmaPageState extends State<OdaklanmaPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isWide = MediaQuery.of(context).size.width > 600;
+
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -39,21 +41,21 @@ class _OdaklanmaPageState extends State<OdaklanmaPage> {
           children: [
             /// Sayaç
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(24),
               child: Column(
                 children: [
                   const Text(
                     'Çalışma Süresi Seç',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 30),
                   SizedBox(
-                    height: 150,
+                    height: 200,
                     child: Row(
                       children: [
                         Expanded(
                           child: CupertinoPicker(
-                            itemExtent: 40,
+                            itemExtent: 50,
                             scrollController: FixedExtentScrollController(
                               initialItem: selectedHours,
                             ),
@@ -70,7 +72,7 @@ class _OdaklanmaPageState extends State<OdaklanmaPage> {
                         ),
                         Expanded(
                           child: CupertinoPicker(
-                            itemExtent: 40,
+                            itemExtent: 50,
                             scrollController: FixedExtentScrollController(
                               initialItem: selectedMinutes,
                             ),
@@ -88,7 +90,7 @@ class _OdaklanmaPageState extends State<OdaklanmaPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 30),
                   ElevatedButton.icon(
                     onPressed: () {
                       final seconds = selectedHours * 3600 + selectedMinutes * 60;
@@ -106,6 +108,11 @@ class _OdaklanmaPageState extends State<OdaklanmaPage> {
                     },
                     icon: const Icon(Icons.play_arrow),
                     label: const Text('Başlat'),
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: isWide ? 40 : 24, vertical: 16),
+                      textStyle: const TextStyle(fontSize: 18),
+                    ),
                   ),
                 ],
               ),
@@ -113,14 +120,14 @@ class _OdaklanmaPageState extends State<OdaklanmaPage> {
 
             /// Kronometre
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(24),
               child: Column(
                 children: [
                   const Text(
                     'Kronometre',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 30),
                   ElevatedButton.icon(
                     onPressed: () {
                       Navigator.push(
@@ -135,6 +142,11 @@ class _OdaklanmaPageState extends State<OdaklanmaPage> {
                     },
                     icon: const Icon(Icons.play_arrow),
                     label: const Text('Başlat'),
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: isWide ? 40 : 24, vertical: 16),
+                      textStyle: const TextStyle(fontSize: 18),
+                    ),
                   ),
                 ],
               ),
@@ -142,21 +154,21 @@ class _OdaklanmaPageState extends State<OdaklanmaPage> {
 
             /// Pomodoro
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(24),
               child: Column(
                 children: [
                   const Text(
                     'Pomodoro Ayarları',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 30),
                   SizedBox(
-                    height: 150,
+                    height: 200,
                     child: Row(
                       children: [
                         Expanded(
                           child: CupertinoPicker(
-                            itemExtent: 40,
+                            itemExtent: 50,
                             scrollController: FixedExtentScrollController(
                               initialItem: workMinutes - 1,
                             ),
@@ -174,7 +186,7 @@ class _OdaklanmaPageState extends State<OdaklanmaPage> {
                         ),
                         Expanded(
                           child: CupertinoPicker(
-                            itemExtent: 40,
+                            itemExtent: 50,
                             scrollController: FixedExtentScrollController(
                               initialItem: breakMinutes - 1,
                             ),
@@ -192,7 +204,7 @@ class _OdaklanmaPageState extends State<OdaklanmaPage> {
                         ),
                         Expanded(
                           child: CupertinoPicker(
-                            itemExtent: 40,
+                            itemExtent: 50,
                             scrollController: FixedExtentScrollController(
                               initialItem: pomodoroRounds - 1,
                             ),
@@ -210,7 +222,7 @@ class _OdaklanmaPageState extends State<OdaklanmaPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 30),
                   ElevatedButton.icon(
                     onPressed: () {
                       Navigator.push(
@@ -226,6 +238,11 @@ class _OdaklanmaPageState extends State<OdaklanmaPage> {
                     },
                     icon: const Icon(Icons.play_arrow),
                     label: const Text('Başlat'),
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: isWide ? 40 : 24, vertical: 16),
+                      textStyle: const TextStyle(fontSize: 18),
+                    ),
                   ),
                 ],
               ),

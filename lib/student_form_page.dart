@@ -34,9 +34,12 @@ class _StudentFormPageState extends State<StudentFormPage> {
     await prefs.setString('hedefUni', _hedefUniController.text);
     await prefs.setString('hedefBolum', _hedefBolumController.text);
 
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Bilgiler kaydedildi ✅')),
     );
+
+    Navigator.pop(context);
   }
 
   @override
@@ -46,35 +49,48 @@ class _StudentFormPageState extends State<StudentFormPage> {
         title: const Text('👤 Öğrenci Formu'),
         backgroundColor: Colors.lightBlue,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: ListView(
-          children: [
-            _buildTextField(_isimController, 'İsim'),
-            const SizedBox(height: 12),
-            _buildTextField(_soyisimController, 'Soyisim'),
-            const SizedBox(height: 12),
-            _buildGenderDropdown(),
-            const SizedBox(height: 12),
-            _buildTextField(_dogumTarihiController, 'Doğum Tarihi (g/a/y)'),
-            const SizedBox(height: 12),
-            _buildTextField(_guncelTYTController, 'Güncel TYT Netin', isNumber: true),
-            const SizedBox(height: 12),
-            _buildTextField(_hedefTYTController, 'Hedef TYT Netin', isNumber: true),
-            const SizedBox(height: 12),
-            _buildTextField(_guncelAYTController, 'Güncel AYT Netin', isNumber: true),
-            const SizedBox(height: 12),
-            _buildTextField(_hedefAYTController, 'Hedef AYT Netin', isNumber: true),
-            const SizedBox(height: 12),
-            _buildTextField(_hedefUniController, 'Hedef Üniversite'),
-            const SizedBox(height: 12),
-            _buildTextField(_hedefBolumController, 'Hedef Bölüm'),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: saveForm,
-              child: const Text('Kaydet'),
-            ),
-          ],
+      body: Container(
+        color: Colors.lightBlue.shade50,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: ListView(
+            children: [
+              _buildTextField(_isimController, 'İsim'),
+              const SizedBox(height: 12),
+              _buildTextField(_soyisimController, 'Soyisim'),
+              const SizedBox(height: 12),
+              _buildGenderDropdown(),
+              const SizedBox(height: 12),
+              _buildTextField(_dogumTarihiController, 'Doğum Tarihi (g/a/y)'),
+              const SizedBox(height: 12),
+              _buildTextField(_guncelTYTController, 'Güncel TYT Netin', isNumber: true),
+              const SizedBox(height: 12),
+              _buildTextField(_hedefTYTController, 'Hedef TYT Netin', isNumber: true),
+              const SizedBox(height: 12),
+              _buildTextField(_guncelAYTController, 'Güncel AYT Netin', isNumber: true),
+              const SizedBox(height: 12),
+              _buildTextField(_hedefAYTController, 'Hedef AYT Netin', isNumber: true),
+              const SizedBox(height: 12),
+              _buildTextField(_hedefUniController, 'Hedef Üniversite'),
+              const SizedBox(height: 12),
+              _buildTextField(_hedefBolumController, 'Hedef Bölüm'),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: saveForm,
+                icon: const Icon(Icons.save_alt),
+                label: const Text('Kaydet'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor: Colors.lightBlue,
+                  foregroundColor: Colors.white,
+                  textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

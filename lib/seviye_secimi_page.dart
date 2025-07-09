@@ -27,27 +27,41 @@ class SeviyeSecimiPage extends StatelessWidget {
             itemCount: seviyeler.length,
             itemBuilder: (context, index) {
               final seviye = seviyeler[index];
-              return InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const VideoListesiPage()),
-                  );
-                },
-                borderRadius: BorderRadius.circular(16),
-                child: Ink(
-                  decoration: BoxDecoration(
-                    color: Colors.lightBlue.shade50,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.lightBlue.shade200, width: 1.5),
-                  ),
-                  child: Center(
-                    child: Text(
-                      seviye,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.lightBlue,
+              return Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const VideoListesiPage()),
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(16),
+                  splashColor: Colors.lightBlue.shade100,
+                  child: Ink(
+                    decoration: BoxDecoration(
+                      color: Colors.lightBlue.shade50,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Colors.lightBlue.shade300,
+                        width: 2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.lightBlue.withOpacity(0.2),
+                          blurRadius: 6,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Text(
+                        seviye,
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.lightBlue,
+                        ),
                       ),
                     ),
                   ),

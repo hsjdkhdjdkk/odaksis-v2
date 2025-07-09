@@ -27,7 +27,7 @@ class _FocusSessionPageState extends State<FocusSessionPage> {
   int pomodoroRound = 1;
   static const int totalRounds = 4;
   bool isWork = true;
-  int initialWork = 25 * 60; // Dakika * 60
+  int initialWork = 25 * 60;
   int initialBreak = 5 * 60;
 
   /// UI kontrol
@@ -42,8 +42,7 @@ class _FocusSessionPageState extends State<FocusSessionPage> {
     if (widget.isPomodoro) {
       pomodoroRound = 1;
       isWork = true;
-      initialWork = widget.totalSeconds; // Çalışma süresi parametreden geliyor
-      initialBreak = 5 * 60; // İstersen parametrele
+      initialWork = widget.totalSeconds;
     }
 
     _startSession();
@@ -62,7 +61,6 @@ class _FocusSessionPageState extends State<FocusSessionPage> {
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       setState(() {
         if (widget.isCountdown && !widget.isPomodoro) {
-          // Klasik sayaç
           if (secondsLeft > 0) {
             secondsLeft--;
           } else {
@@ -74,11 +72,9 @@ class _FocusSessionPageState extends State<FocusSessionPage> {
             secondsLeft--;
           } else {
             if (isWork) {
-              // Çalışma bitti → Mola başlat
               isWork = false;
               secondsLeft = initialBreak;
             } else {
-              // Mola bitti → Tur kontrol
               if (pomodoroRound < totalRounds) {
                 pomodoroRound++;
                 isWork = true;
@@ -90,7 +86,6 @@ class _FocusSessionPageState extends State<FocusSessionPage> {
             }
           }
         } else {
-          // Kronometre
           secondsLeft++;
         }
       });
@@ -165,6 +160,8 @@ class _FocusSessionPageState extends State<FocusSessionPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isTablet = MediaQuery.of(context).size.width > 600;
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: GestureDetector(
@@ -176,7 +173,7 @@ class _FocusSessionPageState extends State<FocusSessionPage> {
               child: AnimatedDefaultTextStyle(
                 duration: const Duration(milliseconds: 300),
                 style: TextStyle(
-                  fontSize: showControls ? 60 : 80,
+                  fontSize: showControls ? (isTablet ? 70 : 60) : (isTablet ? 100 : 80),
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),

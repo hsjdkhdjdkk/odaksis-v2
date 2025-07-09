@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:path_provider/path_provider.dart';
@@ -72,7 +71,8 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       return;
     }
 
-    final questionsData = json.decode(await rootBundle.loadString('assets/questions.json'));
+    final questionsData =
+    json.decode(await rootBundle.loadString('assets/questions.json'));
     List<dynamic> eksiklerList = json.decode(await file.readAsString());
 
     for (var eksik in List.from(eksiklerList)) {
@@ -97,7 +97,8 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           context: context,
           barrierDismissible: false,
           builder: (_) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             title: Row(
               children: [
                 const Icon(Icons.quiz, color: Colors.deepPurple, size: 28),
@@ -139,11 +140,14 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
         await showDialog(
           context: context,
           builder: (_) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             title: Row(
               children: [
                 Icon(
-                  isCorrect ? Icons.check_circle_outline : Icons.cancel_outlined,
+                  isCorrect
+                      ? Icons.check_circle_outline
+                      : Icons.cancel_outlined,
                   color: isCorrect ? Colors.green : Colors.red,
                   size: 30,
                 ),
@@ -159,7 +163,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
             ),
             content: Text(
               isCorrect
-                  ? "Tebrikler doğru cevapladın."
+                  ? "Tebrikler, doğru cevapladın!"
                   : "Doğru cevap: $correctAnswer",
             ),
             actions: [

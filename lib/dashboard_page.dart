@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-// Odaklanma sayfasını import et
 import 'odaklanma_page.dart';
+import 'notlarim_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -35,7 +36,6 @@ class _DashboardPageState extends State<DashboardPage> {
     loadProgram();
   }
 
-  /// ✅ PROFIL SharedPreferences'tan ISIM oku
   Future<void> loadUserName() async {
     final prefs = await SharedPreferences.getInstance();
     final name = prefs.getString('isim') ?? "Öğrenci";
@@ -44,7 +44,6 @@ class _DashboardPageState extends State<DashboardPage> {
     });
   }
 
-  /// ✅ Program json'dan oku
   Future<void> loadProgram() async {
     final dir = await getApplicationDocumentsDirectory();
     final file = File('${dir.path}/program.json');
@@ -67,8 +66,6 @@ class _DashboardPageState extends State<DashboardPage> {
     setState(() {
       _program = parsed;
     });
-
-    debugPrint('✅ Dashboard Loaded Program: $_program');
   }
 
   @override
@@ -79,42 +76,62 @@ class _DashboardPageState extends State<DashboardPage> {
 
     final selectedKonular = dayKey == null ? [] : _program[dayKey] ?? [];
 
+    final isTablet = MediaQuery.of(context).size.width > 600;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('📅 Dashboard'),
         backgroundColor: Colors.lightBlue,
         actions: [
-          // ✅ ODAK Butonu + ikon (ikon sağda)
-          TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const OdaklanmaPage()),
-              );
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.white, width: 2),
-                borderRadius: BorderRadius.circular(20),
-                color: Colors.lightBlue.shade700,
+          /// ✅ ODAK BUTONU
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const OdaklanmaPage()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.blueAccent,
+                side: const BorderSide(color: Colors.blueAccent, width: 2),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30)),
               ),
-              child: Row(
-                children: const [
-                  Text(
-                    'ODAK',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(width: 6),
-                  Icon(Icons.play_arrow, color: Colors.white, size: 20),
-                ],
+              child: const Text(
+                'ODAK',
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
           ),
-          const SizedBox(width: 12),
+
+          const SizedBox(width: 6),
+
+          /// ✅ NOTLARIM BUTONU
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const NotlarimPage()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.blueAccent,
+                side: const BorderSide(color: Colors.blueAccent, width: 2),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30)),
+              ),
+              child: const Text(
+                'NOTLAR',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
         ],
       ),
       body: Padding(
@@ -126,25 +143,27 @@ class _DashboardPageState extends State<DashboardPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Hoş Geldin, $userName!',
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                Flexible(
+                  child: Text(
+                    'Hoş Geldin, $userName!',
+                    style: TextStyle(
+                      fontSize: isTablet ? 26 : 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
                   ),
                 ),
                 Container(
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.lightBlue.shade100,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     'YKS: $daysUntilYKS gün',
-                    style: const TextStyle(
-                      fontSize: 14,
+                    style: TextStyle(
+                      fontSize: isTablet ? 16 : 14,
                       fontWeight: FontWeight.w600,
                       color: Colors.black87,
                     ),
@@ -155,7 +174,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
             const SizedBox(height: 20),
 
-            /// ✅ Takvim (format butonu gizli!)
+            /// ✅ Takvim
             TableCalendar(
               firstDay: DateTime.now().subtract(const Duration(days: 365)),
               lastDay: DateTime.now().add(const Duration(days: 365)),
@@ -167,10 +186,6 @@ class _DashboardPageState extends State<DashboardPage> {
                   _focusedDay = focusedDay;
                 });
               },
-              headerStyle: const HeaderStyle(
-                formatButtonVisible: false, // ✔ 2 weeks butonunu GİZLE
-                titleCentered: true,
-              ),
               calendarStyle: const CalendarStyle(
                 isTodayHighlighted: true,
                 selectedDecoration: BoxDecoration(
@@ -205,14 +220,24 @@ class _DashboardPageState extends State<DashboardPage> {
 
             Expanded(
               child: selectedKonular.isEmpty
-                  ? const Text('Seçili günde konu yok.')
+                  ? const Text(
+                'Seçili günde konu yok.',
+                style:
+                TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
+              )
                   : ListView.builder(
                 itemCount: selectedKonular.length,
                 itemBuilder: (context, index) {
-                  return ListTile(
-                    leading: const Icon(Icons.check_circle,
-                        color: Colors.green),
-                    title: Text(selectedKonular[index]),
+                  return Card(
+                    elevation: 1,
+                    child: ListTile(
+                      leading: const Icon(Icons.check_circle,
+                          color: Colors.green),
+                      title: Text(
+                        selectedKonular[index],
+                        style: const TextStyle(fontSize: 15),
+                      ),
+                    ),
                   );
                 },
               ),

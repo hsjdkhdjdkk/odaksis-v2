@@ -1,6 +1,10 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'bardak_detay_page.dart';
+import 'bardak_guncel_durum_page.dart';
+import 'bardak_calisma_sure_page.dart';
+import 'bardak_deneme_sonuc_page.dart';
+import 'bardak_deneme_istatistik_page.dart';
 import 'eksiklerim_page.dart';
 
 class BardakPage extends StatefulWidget {
@@ -11,34 +15,25 @@ class BardakPage extends StatefulWidget {
 }
 
 class _BardakPageState extends State<BardakPage> {
-  int tytDoluluk = 50;
-  int aytDoluluk = 70;
+  int selectedIndex = 0;
 
-  List<int> dailyMinutes = List.generate(7, (_) => 30 + Random().nextInt(180));
-  int? selectedDayIndex;
-
-  final List<String> weekDays = [
-    'Pzt',
-    'Sal',
-    'Çar',
-    'Per',
-    'Cum',
-    'Cmt',
-    'Paz',
+  final List<String> sekmeler = [
+    'Bardağın Dolu Tarafı',
+    'Çalışma Sürem',
+    'Güncel Durumum ve Hedeflerim',
+    'Deneme Sonuçlarım',
+    'Deneme İstatistiklerim',
+    'Eksiklerim',
   ];
 
-  void rastgeleDoldur() {
-    setState(() {
-      tytDoluluk = Random().nextInt(100);
-      aytDoluluk = Random().nextInt(100);
-    });
-  }
-
-  String formatTime(int minutes) {
-    final hours = minutes ~/ 60;
-    final mins = minutes % 60;
-    return '${hours}sa ${mins}dk';
-  }
+  final List<Widget> sayfalar = [
+    const BardakDetaySecimPage(),
+    const BardakCalismaSurePage(),
+    const BardakGuncelDurumPage(),
+    const BardakDenemeSonucPage(),
+    const BardakDenemeIstatistikPage(),
+    const EksiklerimPage(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -47,174 +42,82 @@ class _BardakPageState extends State<BardakPage> {
         title: const Text('☕ Odaksis Bardak Ekranı'),
         backgroundColor: Colors.lightBlue,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: ListView(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildMainCup(
-                  label: 'TYT',
-                  percent: tytDoluluk,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => BardakDetayPage(
-                          type: 'TYT',
-                          onAverageCalculated: (value) {
-                            setState(() {
-                              tytDoluluk = value.toInt();
-                            });
-                          },
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                _buildMainCup(
-                  label: 'AYT',
-                  percent: aytDoluluk,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => BardakDetayPage(
-                          type: 'AYT',
-                          onAverageCalculated: (value) {
-                            setState(() {
-                              aytDoluluk = value.toInt();
-                            });
-                          },
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            const SizedBox(height: 40),
-            const Text(
-              '📊 Günlük Ekran Süresi',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              height: 250,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: List.generate(dailyMinutes.length, (index) {
-                  final maxValue = dailyMinutes.reduce(max).toDouble();
-                  final value = dailyMinutes[index].toDouble();
-                  final heightPercent = value / maxValue;
-
-                  return GestureDetector(
-                    onTap: () {
+      body: Column(
+        children: [
+          SizedBox(
+            height: 50,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: sekmeler.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                  child: ChoiceChip(
+                    label: Text(sekmeler[index]),
+                    selected: selectedIndex == index,
+                    onSelected: (_) {
                       setState(() {
-                        selectedDayIndex = selectedDayIndex == index ? null : index;
+                        selectedIndex = index;
                       });
                     },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        if (selectedDayIndex == index)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.blueAccent,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              formatTime(dailyMinutes[index]),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        const SizedBox(height: 6),
-                        Container(
-                          width: 24,
-                          height: 200 * heightPercent,
-                          decoration: BoxDecoration(
-                            color: Colors.lightBlue,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(weekDays[index]),
-                      ],
-                    ),
-                  );
-                }),
-              ),
-            ),
-            const SizedBox(height: 40),
-
-            /// Eksiklerim Butonu
-            Center(
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const EksiklerimPage()),
-                  );
-                },
-
-                icon: const Icon(Icons.warning_amber),
-                label: const Text('Eksiklerim'),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                  backgroundColor: Colors.redAccent,
-                  foregroundColor: Colors.white,
-                  textStyle: const TextStyle(fontSize: 18),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
                   ),
-                ),
-              ),
+                );
+              },
             ),
-          ],
-        ),
+          ),
+          const Divider(),
+          Expanded(child: sayfalar[selectedIndex]),
+        ],
+      ),
+    );
+  }
+}
+
+class BardakDetaySecimPage extends StatelessWidget {
+  const BardakDetaySecimPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(32),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _buildMainCup(context, 'TYT'),
+          _buildMainCup(context, 'AYT'),
+        ],
       ),
     );
   }
 
-  Widget _buildMainCup({
-    required String label,
-    required int percent,
-    required VoidCallback onTap,
-  }) {
+  Widget _buildMainCup(BuildContext context, String label) {
+    final percent = Random().nextInt(100);
     return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(100),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => BardakDetayPage(
+              type: label,
+              onAverageCalculated: (_) {},
+            ),
+          ),
+        );
+      },
       child: Column(
         children: [
           SizedBox(
+            height: 150,
             width: 80,
-            height: 140,
             child: CustomPaint(
               painter: OpenTopGlassPainter(percent / 100),
               child: Center(
-                child: Text(
-                  '$percent%',
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                ),
+                child: Text('$percent%'),
               ),
             ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.blueAccent,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          const SizedBox(height: 8),
+          Text(label, style: const TextStyle(fontSize: 16)),
         ],
       ),
     );
@@ -229,12 +132,12 @@ class OpenTopGlassPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final outline = Paint()
-      ..color = Colors.lightBlue
+      ..color = Colors.blue
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 
     final su = Paint()
-      ..color = Colors.lightBlue.shade200
+      ..color = Colors.blue.shade200
       ..style = PaintingStyle.fill;
 
     final width = size.width;

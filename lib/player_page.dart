@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
@@ -9,7 +8,13 @@ import 'package:path_provider/path_provider.dart';
 
 class PlayerPage extends StatefulWidget {
   final String videoId;
-  const PlayerPage({super.key, required this.videoId});
+  final List<Map<String, String>> videoList;
+
+  const PlayerPage({
+    super.key,
+    required this.videoId,
+    required this.videoList,
+  });
 
   @override
   State<PlayerPage> createState() => _PlayerPageState();
@@ -17,41 +22,101 @@ class PlayerPage extends StatefulWidget {
 
 class _PlayerPageState extends State<PlayerPage> {
   late YoutubePlayerController _controller;
-  Timer? _checkTimer;
+  bool isPanelOpen = true;
+  OverlayEntry? _overlayEntry;
+
+  Map<String, dynamic> questionsMap = {};
+  List<String> currentQuestions = [];
+  TextEditingController noteController = TextEditingController();
+  late String currentVideoId;
 
   List<int> pausePoints = [];
-  Map<String, dynamic> questionsMap = {};
-  final Set<int> askedPoints = {};
+  Set<int> askedPoints = {};
+  Timer? _checkTimer;
 
   @override
   void initState() {
     super.initState();
-    _controller = YoutubePlayerController();
-    _controller.loadVideoById(videoId: widget.videoId);
+    currentVideoId = widget.videoId;
 
-    lockOrientation();
-    loadPauseAndQuestions().then((_) {
-      _checkTimer = Timer.periodic(const Duration(seconds: 1), (_) => checkPausePoints());
+    _controller = YoutubePlayerController(
+      params: const YoutubePlayerParams(
+        showControls: true,
+        showFullscreenButton: false,
+      ),
+    )..loadVideoById(videoId: currentVideoId);
+
+    _lockLandscape();
+    loadQuestions(currentVideoId);
+    loadPausePoints(currentVideoId);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _insertOverlay();
+    });
+
+    _checkTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      checkPausePoints();
     });
   }
 
-  Future<void> lockOrientation() async {
+  void _insertOverlay() {
+    _overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        right: 0,
+        top: MediaQuery.of(context).size.height / 2 - 25,
+        child: SafeArea(
+          child: GestureDetector(
+            onTap: () {
+              setState(() {
+                isPanelOpen = !isPanelOpen;
+              });
+              _overlayEntry?.markNeedsBuild();
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.6),
+                shape: BoxShape.circle,
+              ),
+              padding: const EdgeInsets.all(8),
+              child: Icon(
+                isPanelOpen ? Icons.chevron_right : Icons.chevron_left,
+                color: Colors.white,
+                size: 28,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    Overlay.of(context).insert(_overlayEntry!);
+  }
+
+  Future<void> _lockLandscape() async {
     await SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
   }
 
-  Future<void> loadPauseAndQuestions() async {
-    final pauseJson = json.decode(await rootBundle.loadString('assets/pause_data.json'));
-    final questionJson = json.decode(await rootBundle.loadString('assets/questions.json'));
+  Future<void> loadQuestions(String videoId) async {
+    final questionJson =
+    json.decode(await rootBundle.loadString('assets/questions.json'));
+    setState(() {
+      questionsMap = questionJson[videoId] ?? {};
+      currentQuestions = questionsMap.keys.toList();
+      askedPoints.clear();
+    });
+  }
 
-    final videoPauseData = pauseJson[widget.videoId];
+  Future<void> loadPausePoints(String videoId) async {
+    final pauseJson =
+    json.decode(await rootBundle.loadString('assets/pause_data.json'));
+    final videoPauseData = pauseJson[videoId];
     if (videoPauseData != null) {
       pausePoints = List<int>.from(videoPauseData['pause_points']);
+    } else {
+      pausePoints = [];
     }
-
-    questionsMap = questionJson[widget.videoId] ?? {};
   }
 
   void checkPausePoints() async {
@@ -62,18 +127,15 @@ class _PlayerPageState extends State<PlayerPage> {
       if ((currentSec - p).abs() <= 1 && !askedPoints.contains(p)) {
         askedPoints.add(p);
         _controller.pauseVideo();
-        askQuestion(p);
+        _showQuestion(p.toString());
         break;
       }
     }
   }
 
-  void askQuestion(int point) async {
-    final questionData = questionsMap[point.toString()];
-    if (questionData == null) {
-      _controller.playVideo();
-      return;
-    }
+  void _showQuestion(String point) async {
+    final questionData = questionsMap[point];
+    if (questionData == null) return;
 
     final result = await showDialog<String>(
       context: context,
@@ -150,7 +212,7 @@ class _PlayerPageState extends State<PlayerPage> {
           ),
           content: Text(
             isCorrect
-                ? "Tebrikler, doğru cevapladın!"
+                ? "Tebrikler doğru cevapladın!"
                 : "Doğru cevap: $correctAnswer",
           ),
           actions: [
@@ -166,7 +228,8 @@ class _PlayerPageState extends State<PlayerPage> {
     }
   }
 
-  Future<void> saveWrongAnswer(String soru, String dogru, String kullanici) async {
+  Future<void> saveWrongAnswer(
+      String soru, String dogru, String kullanici) async {
     final dir = await getApplicationDocumentsDirectory();
     final file = File('${dir.path}/eksikler.json');
 
@@ -185,8 +248,60 @@ class _PlayerPageState extends State<PlayerPage> {
     await file.writeAsString(jsonEncode(existing));
   }
 
+  Future<void> saveNote(String note) async {
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File('${dir.path}/video_notes.json');
+
+    List<dynamic> existing = [];
+    if (await file.exists()) {
+      final jsonString = await file.readAsString();
+      existing = jsonDecode(jsonString);
+    }
+
+    existing.add({
+      'videoId': currentVideoId,
+      'note': note,
+      'timestamp': DateTime.now().toIso8601String(),
+    });
+
+    await file.writeAsString(jsonEncode(existing));
+  }
+
+  void _showNotePopup() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Yeni Not"),
+        content: TextField(
+          controller: noteController,
+          maxLines: 5,
+          decoration: const InputDecoration(hintText: "Notunuzu yazın..."),
+        ),
+        actions: [
+          TextButton(
+            child: const Text("İptal"),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          TextButton(
+            child: const Text("Kaydet"),
+            onPressed: () {
+              if (noteController.text.isNotEmpty) {
+                saveNote(noteController.text);
+                noteController.clear();
+                Navigator.pop(context);
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void dispose() {
+    _overlayEntry?.remove();
     _checkTimer?.cancel();
     _controller.close();
     SystemChrome.setPreferredOrientations([
@@ -196,23 +311,109 @@ class _PlayerPageState extends State<PlayerPage> {
     super.dispose();
   }
 
+  String getShortTitle(String title) {
+    final parts = title.split('|');
+    if (parts.length >= 3) {
+      return '${parts[1].trim()} | ${parts[2].trim()}';
+    }
+    return title;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return YoutubePlayerScaffold(
-      controller: _controller,
-      builder: (context, player) {
-        return Scaffold(
-          backgroundColor: Colors.black,
-          body: SafeArea(
-            child: Center(
-              child: AspectRatio(
-                aspectRatio: 16 / 9,
-                child: player,
-              ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Row(
+        children: [
+          Expanded(
+            flex: isPanelOpen ? 6 : 10,
+            child: Column(
+              children: [
+                Expanded(
+                  child: YoutubePlayerScaffold(
+                    controller: _controller,
+                    builder: (context, player) => player,
+                  ),
+                ),
+                if (isPanelOpen)
+                  Container(
+                    width: double.infinity,
+                    color: Colors.white,
+                    padding: const EdgeInsets.all(8),
+                    child: Wrap(
+                      children: currentQuestions
+                          .map(
+                            (q) => Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: ElevatedButton(
+                            onPressed: () => _showQuestion(q),
+                            child: Text("Soru $q"),
+                          ),
+                        ),
+                      )
+                          .toList(),
+                    ),
+                  ),
+                if (isPanelOpen)
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: ElevatedButton.icon(
+                      onPressed: _showNotePopup,
+                      icon: const Icon(Icons.note_add),
+                      label: const Text("Not Ekle"),
+                    ),
+                  ),
+              ],
             ),
           ),
-        );
-      },
+          if (isPanelOpen)
+            Expanded(
+              flex: 4,
+              child: Container(
+                color: Colors.white,
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        const Text(
+                          "📺 Sıradaki Videolar",
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: widget.videoList.length,
+                        itemBuilder: (context, index) {
+                          final video = widget.videoList[index];
+                          final title = getShortTitle(video['title'] ?? '');
+                          return ListTile(
+                            title: Text(title),
+                            onTap: () {
+                              setState(() {
+                                currentVideoId = video['videoId'] ?? '';
+                                _controller.loadVideoById(
+                                    videoId: currentVideoId);
+                                loadQuestions(currentVideoId);
+                                loadPausePoints(currentVideoId);
+                                askedPoints.clear();
+                              });
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

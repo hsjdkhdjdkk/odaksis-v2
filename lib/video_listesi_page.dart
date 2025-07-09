@@ -15,6 +15,7 @@ class _VideoListesiPageState extends State<VideoListesiPage> {
   final String playlistId = 'PLqLwBmByktJUJ8X-eYSHSxUH8uGkSqUsB';
   List<Map<String, String>> videos = [];
   String? nextPageToken;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -23,6 +24,11 @@ class _VideoListesiPageState extends State<VideoListesiPage> {
   }
 
   Future<void> fetchVideos() async {
+    if (isLoading) return;
+    setState(() {
+      isLoading = true;
+    });
+
     final url = Uri.parse(
       'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=20&playlistId=$playlistId&key=$apiKey&pageToken=${nextPageToken ?? ""}',
     );
@@ -40,6 +46,7 @@ class _VideoListesiPageState extends State<VideoListesiPage> {
     setState(() {
       videos.addAll(newVideos);
       nextPageToken = data['nextPageToken'];
+      isLoading = false;
     });
 
     if (nextPageToken != null) {
@@ -50,22 +57,36 @@ class _VideoListesiPageState extends State<VideoListesiPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('🎥 Video Listesi')),
-      body: ListView.builder(
+      appBar: AppBar(
+        title: const Text('🎥 Video Listesi'),
+        backgroundColor: Colors.lightBlue,
+      ),
+      body: videos.isEmpty
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.builder(
         itemCount: videos.length,
         itemBuilder: (context, index) {
           final video = videos[index];
-          return ListTile(
-            title: Text(video['title'] ?? ''),
-            trailing: const Icon(Icons.play_arrow),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => PlayerPage(videoId: video['videoId'] ?? ''),
-                ),
-              );
-            },
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            child: ListTile(
+              title: Text(
+                video['title'] ?? '',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              trailing: const Icon(Icons.play_circle_fill, color: Colors.blueAccent),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => PlayerPage(
+                      videoId: video['videoId'] ?? '',
+                      videoList: videos,
+                    ),
+                  ),
+                );
+              },
+            ),
           );
         },
       ),

@@ -60,48 +60,58 @@ class _BardakDetayPageState extends State<BardakDetayPage> {
       appBar: AppBar(
         title: Text('${widget.type} Ders Bardakları'),
         backgroundColor: Colors.lightBlue,
+        elevation: 0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(12),
-        child: GridView.count(
-          crossAxisCount: 2, // ✅ 2 sütun!
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 0.6, // oran sabit, bardak dik
-          children: list.map((ders) {
-            final value = doluluklar[ders]!;
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  height: 140,
-                  width: 80,
-                  child: CustomPaint(
-                    painter: OpenTopGlassPainter(value),
-                    child: Center(
-                      child: Text(
-                        '${(value * 100).toInt()}%',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final isTablet = constraints.maxWidth > 600;
+          final crossAxisCount = isTablet ? 3 : 2;
+
+          return Padding(
+            padding: const EdgeInsets.all(16),
+            child: GridView.count(
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 0.55,
+              children: list.map((ders) {
+                final value = doluluklar[ders]!;
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      height: isTablet ? 200 : 140,
+                      width: isTablet ? 100 : 80,
+                      child: CustomPaint(
+                        painter: OpenTopGlassPainter(value),
+                        child: Center(
+                          child: Text(
+                            '${(value * 100).toInt()}%',
+                            style: TextStyle(
+                              fontSize: isTablet ? 16 : 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blueAccent.shade700,
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  ders,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.blueAccent,
-                  ),
-                ),
-              ],
-            );
-          }).toList(),
-        ),
+                    const SizedBox(height: 6),
+                    Text(
+                      ders,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: isTablet ? 14 : 12,
+                        color: Colors.blueGrey.shade800,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                );
+              }).toList(),
+            ),
+          );
+        },
       ),
     );
   }
@@ -115,12 +125,18 @@ class OpenTopGlassPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final outline = Paint()
-      ..color = Colors.lightBlue
+      ..color = Colors.lightBlue.shade700
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
+      ..strokeWidth = 3;
+
+    final gradient = LinearGradient(
+      colors: [Colors.lightBlueAccent, Colors.blue.shade700],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+    );
 
     final su = Paint()
-      ..color = Colors.lightBlue.shade200
+      ..shader = gradient.createShader(Rect.fromLTWH(0, 0, size.width, size.height))
       ..style = PaintingStyle.fill;
 
     final width = size.width;
@@ -130,7 +146,8 @@ class OpenTopGlassPainter extends CustomPainter {
       ..moveTo(0, 0)
       ..lineTo(0, height)
       ..lineTo(width, height)
-      ..lineTo(width, 0);
+      ..lineTo(width, 0)
+      ..close();
 
     canvas.drawPath(path, outline);
 
