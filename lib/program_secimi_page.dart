@@ -109,7 +109,7 @@ class _ProgramSecimiPageState extends State<ProgramSecimiPage> {
   }
 
   int get estimatedDays {
-    final totalHours = selectedKonular.length * 1; // 1 saat per konu
+    final totalHours = selectedKonular.length * 1;
     final daily = int.parse(dailyHours);
     return (totalHours / daily).ceil();
   }
@@ -137,8 +137,8 @@ class _ProgramSecimiPageState extends State<ProgramSecimiPage> {
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('✅ Program Kaydedildi'),
-        content: const Text(
-            'Programınız kaydedildi. Anasayfada inceleyebilirsiniz!'),
+        content:
+        const Text('Programınız kaydedildi. Anasayfada inceleyebilirsiniz!'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -165,7 +165,15 @@ class _ProgramSecimiPageState extends State<ProgramSecimiPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('⚙️ Kendi Programını Oluştur'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          '⚙️ Kendi Programını Oluştur',
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () {
@@ -176,11 +184,11 @@ class _ProgramSecimiPageState extends State<ProgramSecimiPage> {
             },
             child: const Text(
               'Hazır Programlar',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.lightBlue),
             ),
           )
         ],
-        backgroundColor: Colors.lightBlue,
+        iconTheme: const IconThemeData(color: Colors.black87),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -192,8 +200,7 @@ class _ProgramSecimiPageState extends State<ProgramSecimiPage> {
               DropdownButton<String>(
                 value: selectedLevel,
                 items: ['TYT', 'AYT']
-                    .map((e) =>
-                    DropdownMenuItem(value: e, child: Text(e)))
+                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                     .toList(),
                 onChanged: (v) {
                   setState(() {

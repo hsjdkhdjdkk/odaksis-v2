@@ -109,7 +109,7 @@ class _TytProgramPageState extends State<TytProgramPage> {
     debugPrint('✅ Program JSON Kaydedildi: ${file.path}');
 
     if (mounted) {
-      Navigator.push( // ✅ pushReplacement yerine push!
+      Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const DashboardPage()),
       );
@@ -120,8 +120,16 @@ class _TytProgramPageState extends State<TytProgramPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('📚 TYT Programı'),
-        backgroundColor: Colors.lightBlue,
+        title: const Text(
+          '📚 TYT Programı',
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black87),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -188,8 +196,7 @@ class _TytProgramPageState extends State<TytProgramPage> {
               icon: const Icon(Icons.check_circle),
               label: const Text('Kaydet ve Dashboard'),
               style: ElevatedButton.styleFrom(
-                padding:
-                const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 backgroundColor: Colors.lightBlue,
                 foregroundColor: Colors.white,
               ),

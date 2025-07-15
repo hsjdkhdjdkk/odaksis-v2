@@ -41,7 +41,7 @@ class _NotlarimPageState extends State<NotlarimPage> {
   }
 
   String formatVideoId(String id) {
-    return "Video ID: $id"; // Buraya ID yerine gerçek başlık dönüştürme koyarsın.
+    return "Video ID: $id";
   }
 
   Future<void> deleteNote(int index) async {
@@ -56,15 +56,24 @@ class _NotlarimPageState extends State<NotlarimPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('📝 Notlarım'),
-        backgroundColor: Colors.lightBlue,
+        title: const Text(
+          '📝 Notlarım',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.lightBlue),
       ),
       body: notes.isEmpty
           ? const Center(
         child: Text(
           'Henüz not eklenmedi.',
-          style: TextStyle(fontSize: 16),
+          style: TextStyle(fontSize: 16, color: Colors.black54),
         ),
       )
           : ListView.builder(
@@ -72,20 +81,29 @@ class _NotlarimPageState extends State<NotlarimPage> {
         itemBuilder: (context, index) {
           final note = notes[index];
           return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            elevation: 3,
+            margin:
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12)),
+            elevation: 2,
             child: ListTile(
-              leading: const Icon(Icons.note_alt, color: Colors.lightBlue),
-              title: Text(note['note'] ?? ''),
+              leading: const Icon(Icons.note_alt,
+                  color: Colors.lightBlue),
+              title: Text(
+                note['note'] ?? '',
+                style: const TextStyle(
+                    fontWeight: FontWeight.w500, fontSize: 16),
+              ),
               subtitle: Text(
                 'Video: ${formatVideoId(note['videoId'] ?? '')}\nTarih: ${note['timestamp']?.substring(0, 16) ?? ''}',
+                style: const TextStyle(fontSize: 13),
               ),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.play_circle_fill, color: Colors.green),
+                    icon: const Icon(Icons.play_circle_fill,
+                        color: Colors.lightBlue),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -98,7 +116,7 @@ class _NotlarimPageState extends State<NotlarimPage> {
                     },
                   ),
                   IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.redAccent),
+                    icon: const Icon(Icons.delete, color: Colors.red),
                     onPressed: () => deleteNote(index),
                   ),
                 ],

@@ -16,8 +16,16 @@ class _BardakCalismaSurePageState extends State<BardakCalismaSurePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('⏱️ Çalışma Sürem'),
-        backgroundColor: Colors.lightBlue,
+        title: const Text(
+          '⏱️ Çalışma Sürem',
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black87),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),

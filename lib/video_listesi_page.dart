@@ -58,8 +58,16 @@ class _VideoListesiPageState extends State<VideoListesiPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('🎥 Video Listesi'),
-        backgroundColor: Colors.lightBlue,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          '🎥 Video Listesi',
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.black87),
       ),
       body: videos.isEmpty
           ? const Center(child: CircularProgressIndicator())
@@ -69,12 +77,21 @@ class _VideoListesiPageState extends State<VideoListesiPage> {
           final video = videos[index];
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            elevation: 1,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             child: ListTile(
               title: Text(
                 video['title'] ?? '',
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              trailing: const Icon(Icons.play_circle_fill, color: Colors.blueAccent),
+              trailing: const Icon(
+                Icons.play_circle_fill,
+                color: Colors.blueAccent,
+              ),
               onTap: () {
                 Navigator.push(
                   context,

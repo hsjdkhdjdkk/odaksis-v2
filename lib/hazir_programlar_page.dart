@@ -8,8 +8,16 @@ class HazirProgramlarPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('📋 Hazır Programlar'),
-        backgroundColor: Colors.lightBlue,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          '📋 Hazır Programlar',
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.black87),
       ),
       body: Row(
         children: [

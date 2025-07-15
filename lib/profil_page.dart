@@ -52,8 +52,16 @@ class _ProfilPageState extends State<ProfilPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('👤 Profil - Paketler'),
-        backgroundColor: Colors.lightBlue,
+        title: const Text(
+          '👤 Profil - Paketler',
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black87),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -111,7 +119,7 @@ class _ProfilPageState extends State<ProfilPage> {
                             builder: (_) => const StudentFormPage(),
                           ),
                         );
-                        loadData(); // Dönünce güncelle!
+                        loadData();
                       },
                     ),
                   ],
@@ -134,7 +142,6 @@ class _ProfilPageState extends State<ProfilPage> {
                 2: FlexColumnWidth(2),
               },
               children: [
-                // Başlık satırı
                 TableRow(
                   decoration: const BoxDecoration(color: Color(0xFFE0F7FA)),
                   children: const [

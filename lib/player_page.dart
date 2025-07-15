@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PlayerPage extends StatefulWidget {
   final String videoId;
@@ -50,6 +51,8 @@ class _PlayerPageState extends State<PlayerPage> {
     loadQuestions(currentVideoId);
     loadPausePoints(currentVideoId);
 
+    saveLastVideo();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _insertOverlay();
     });
@@ -57,6 +60,21 @@ class _PlayerPageState extends State<PlayerPage> {
     _checkTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       checkPausePoints();
     });
+  }
+
+  Future<void> saveLastVideo() async {
+    final prefs = await SharedPreferences.getInstance();
+    final lastTitle = getVideoTitle(currentVideoId);
+    await prefs.setString('lastVideoId', currentVideoId);
+    await prefs.setString('lastVideoTitle', lastTitle);
+  }
+
+  String getVideoTitle(String videoId) {
+    try {
+      return widget.videoList.firstWhere((v) => v['videoId'] == videoId)['title'] ?? "Video";
+    } catch (e) {
+      return "Video";
+    }
   }
 
   void _insertOverlay() {
@@ -393,15 +411,16 @@ class _PlayerPageState extends State<PlayerPage> {
                           final video = widget.videoList[index];
                           final title = getShortTitle(video['title'] ?? '');
                           return ListTile(
+                            leading: const Icon(Icons.play_circle_fill, color: Colors.deepPurple),
                             title: Text(title),
                             onTap: () {
                               setState(() {
                                 currentVideoId = video['videoId'] ?? '';
-                                _controller.loadVideoById(
-                                    videoId: currentVideoId);
+                                _controller.loadVideoById(videoId: currentVideoId);
                                 loadQuestions(currentVideoId);
                                 loadPausePoints(currentVideoId);
                                 askedPoints.clear();
+                                saveLastVideo();
                               });
                             },
                           );
